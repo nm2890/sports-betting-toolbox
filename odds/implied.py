@@ -11,6 +11,7 @@ probabilities following some methods known in the literature.
 
 import pandas as pd 
 
+
 def add_margin_column(df , columns_odds) :
 
     df['Margin'] = - 1
@@ -19,12 +20,14 @@ def add_margin_column(df , columns_odds) :
 
     return(df)
 
+
 def compute_implied_probabilities(df : pd.DataFrame,
                     columns_odds : list,
                     method = 'WPO',
                     drop_margin = True,
                     output_mode = 'Odd' # odd or proba in output
                     ) :
+
 
     nb_outcomes = len(columns_odds)
     df = add_margin_column(df , columns_odds)
@@ -54,6 +57,13 @@ def compute_implied_probabilities(df : pd.DataFrame,
             
         df.drop(columns = se_col,inplace=True)
 
+    elif method == 'EQUAL' :
+        # margin is distributed equaly along all odds
+        for col in columns_odds :
+            df[f'Prob_{col}'] = 1 / (df[col] * (1 + df['Margin']))
+        
+
+
         
 
     if drop_margin and 'Margin' in df.columns :
@@ -63,7 +73,6 @@ def compute_implied_probabilities(df : pd.DataFrame,
     if output_mode == 'Odd' :
         for col in columns_odds :
             df[f'{col}_{method}'] = 1/df[f'Prob_{col}']
-
             df.drop(columns = f'Prob_{col}',inplace=True)
 
     
